@@ -14,6 +14,9 @@ jobs:
 
       - name: Delete branch
         run: |
-          git branch -r | grep -v "\<main\>" | grep "origin/${{ github.event.pull_request.head.ref }}" && git push origin --delete ${{ github.event.pull_request.head.ref }}
+          BRANCH=${{ github.event.pull_request.head.ref }}
+          if [ "$BRANCH" != "main" ]; then
+            git push origin --delete $BRANCH || echo "Branch $BRANCH not found, skipping deletion."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
