@@ -1,4 +1,4 @@
-name: Delete branch after merge
+name: Delete branch after merge to main
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   deleteBranch:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -16,7 +16,5 @@ jobs:
         run: |
           BRANCH=${{ github.event.pull_request.head.ref }}
           if [ "$BRANCH" != "main" ]; then
-            git push origin --delete $BRANCH || echo "Branch $BRANCH not found, skipping deletion."
+            git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} --delete $BRANCH || echo "Branch $BRANCH not found, skipping deletion."
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
